@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Get latest version
+KCPTUN_VERSION=$(curl -sS https://api.github.com/repos/xtaci/kcptun/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+
+# Debug
+echo "Version: ${KCPTUN_VERSION}"
+
+# Build
+docker build --pull --build-arg KCPTUN_VERSION=${KCPTUN_VERSION} -f ${DOCKERFILE_PATH} -t ${IMAGE_NAME} .
