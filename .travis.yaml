@@ -1,0 +1,1 @@
+script: curl -Ss -X POST ${DOCKER_TRIGGER_WEBHOOK}
