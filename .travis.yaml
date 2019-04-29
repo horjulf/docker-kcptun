@@ -1,5 +1,0 @@
-dist: xenial
-language: minimal
-git:
-  depth: 1
-script: curl -Ss -X POST ${DOCKER_TRIGGER_WEBHOOK}
