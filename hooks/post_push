@@ -2,13 +2,13 @@
 
 # Tag image with version
 # Get version
-KCPTUN_VERSION=$(docker inspect --format='{{.Config.Labels.KCPTUN_VERSION}}' ${IMAGE_NAME})
+KCPTUN_VERSION=$(docker inspect --format='{{.Config.Labels.KCPTUN_VERSION}}' "${IMAGE_NAME}")
 # Generate tag with version
 KCPTUN_VERSION_TAG="${DOCKER_REPO}:${KCPTUN_VERSION}"
 # Tag image with version
-docker tag ${IMAGE_NAME} ${KCPTUN_VERSION_TAG}
+docker tag "${IMAGE_NAME}" "${KCPTUN_VERSION_TAG}"
 
 echo "Tagged image with KCPTUN_VERSION: ${KCPTUN_VERSION}"
 
 # Push
-docker push ${KCPTUN_VERSION_TAG}
+docker push "${KCPTUN_VERSION_TAG}"
