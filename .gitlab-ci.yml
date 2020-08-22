@@ -14,39 +14,53 @@ get_version:
   script:
     - |
       # Get latest version
-      KCPTUN_VERSION=$(curl -sS https://api.github.com/repos/xtaci/kcptun/releases/latest | jq -cre '.tag_name | ltrimstr("v")')
+      KCPTUN_BRANCH=$(curl -sS https://api.github.com/repos/xtaci/kcptun/releases/latest | jq -cre '.tag_name')
       # Debug
-      echo "Version: ${KCPTUN_VERSION}"
-      echo -n "${KCPTUN_VERSION}" > .version
+      echo "Version: ${KCPTUN_BRANCH}"
+      echo -n "${KCPTUN_BRANCH}" > .version
   artifacts:
     paths:
       - .version
 
 .build-image:
   stage: build
-  needs:
-    - get_version
   image: docker:stable
   services:
     - docker:stable-dind
+  variables:
+    KCPTUN_BRANCH: "master"
   before_script:
-    - export KCPTUN_VERSION=$(cat .version)
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" ${CI_REGISTRY}
 
 build-master:
   extends: .build-image
   script:
-    - docker build --pull --build-arg KCPTUN_VERSION=${KCPTUN_VERSION} -t "${CI_REGISTRY_IMAGE}" .
+    # Master tag
+    - docker build --pull --build-arg KCPTUN_BRANCH=${KCPTUN_BRANCH} -t "${CI_REGISTRY_IMAGE}:${KCPTUN_BRANCH}" .
+    - docker push "${CI_REGISTRY_IMAGE}:${KCPTUN_BRANCH}"
+  only:
+    - master
+
+build-stable:
+  extends: .build-image
+  needs:
+    - get_version
+  script:
+    - export KCPTUN_BRANCH=$(cat .version)
+    # Latest tag
+    - docker build --pull --build-arg KCPTUN_BRANCH=${KCPTUN_BRANCH} -t "${CI_REGISTRY_IMAGE}" .
     - docker push "${CI_REGISTRY_IMAGE}"
-    - docker tag "${CI_REGISTRY_IMAGE}" "${CI_REGISTRY_IMAGE}:${KCPTUN_VERSION}"
-    - docker push "${CI_REGISTRY_IMAGE}:${KCPTUN_VERSION}"
+    # Version tag
+    - docker tag "${CI_REGISTRY_IMAGE}" "${CI_REGISTRY_IMAGE}:${KCPTUN_BRANCH}"
+    - docker push "${CI_REGISTRY_IMAGE}:${KCPTUN_BRANCH}"
   only:
     - master
 
 build:
   extends: .build-image
   script:
-    - docker build --pull --build-arg KCPTUN_VERSION=${KCPTUN_VERSION} -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}" .
+    # Git SHA tag
+    - docker build --pull --build-arg KCPTUN_BRANCH=${KCPTUN_BRANCH} -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}" .
     - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
   except:
     - master
