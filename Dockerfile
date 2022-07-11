@@ -1,7 +1,7 @@
 ARG KCPTUN_BRANCH="master"
 
 # Build
-FROM golang:1.18-alpine3.15 as builder
+FROM golang:1.18-alpine3.16 as builder
 
 ARG KCPTUN_BRANCH
 ENV KCPTUN_BRANCH=${KCPTUN_BRANCH}
@@ -25,7 +25,7 @@ RUN cd \
   && cd server && go build -trimpath -ldflags "-s -w -X main.VERSION=${KCPTUN_GIT}-${DATE}" -o /go/bin/ . && cd ..
 
 # Runtime
-FROM alpine:3.15
+FROM alpine:3.16
 
 ARG KCPTUN_BRANCH
 ENV KCPTUN_BRANCH=${KCPTUN_BRANCH}
