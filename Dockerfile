@@ -1,7 +1,7 @@
 ARG KCPTUN_BRANCH="master"
 
 # Build
-FROM golang:1.18-alpine3.16 as builder
+FROM golang:1.19-alpine3.16 as builder
 
 ARG KCPTUN_BRANCH
 ENV KCPTUN_BRANCH=${KCPTUN_BRANCH}
