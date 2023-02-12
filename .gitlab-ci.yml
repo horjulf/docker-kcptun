@@ -24,9 +24,9 @@ get_version:
 
 .build-image:
   stage: build
-  image: docker:20
+  image: docker:23
   services:
-    - docker:20-dind
+    - docker:23-dind
   variables:
     KCPTUN_BRANCH: "master"
   before_script:
